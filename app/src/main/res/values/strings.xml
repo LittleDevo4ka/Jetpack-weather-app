@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">Jetpack weather app</string>
+
+    <string-array name="tabsNames">
+        <item>Today</item>
+        <item>Future</item>
+    </string-array>
 </resources>
