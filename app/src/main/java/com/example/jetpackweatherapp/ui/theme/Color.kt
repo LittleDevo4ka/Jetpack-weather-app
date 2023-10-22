@@ -26,3 +26,5 @@ val snowColor = Color(0xFFF3E5AB)
 val morningColor = Color(0xFF7DB0F1)
 val eveningColor = Color(0xFF4D7DB4)
 val nightColor = Color(0xFF213F61)
+
+val grayColor59 = Color(0xFF595959)
