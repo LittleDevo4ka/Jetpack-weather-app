@@ -1,9 +1,9 @@
 package com.example.jetpackweatherapp.view
 
-import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.background
@@ -26,10 +26,7 @@ import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -38,47 +35,70 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.jetpackweatherapp.R
-import com.example.jetpackweatherapp.ui.theme.*
+import com.example.jetpackweatherapp.ui.theme.JetpackWeatherAppTheme
+import com.example.jetpackweatherapp.viewModel.MainViewModel
 
 class MainActivity : ComponentActivity() {
-    @SuppressLint("ResourceAsColor")
-    override fun onCreate(savedInstanceState: Bundle?) {
 
+    private var mainViewModel: MainViewModel? = null
+    private var navController: NavHostController? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
+
         setContent {
             JetpackWeatherAppTheme(darkTheme = false) {
                 ChangeSystemBarsTheme(isSystemInDarkTheme())
-                val navController = rememberNavController()
+                navController = rememberNavController()
+                mainViewModel = viewModel()
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     bottomBar = { TabLayout() }
                 ) { contentPadding ->
-                    NavGraph(navController = navController, contentPadding)
+
+                    NavGraph(contentPadding)
+
+                    BackHandler {
+                        customOnBackPressed()
+                    }
                 }
             }
         }
     }
 
     @Composable
-    private fun NavGraph(navController: NavHostController, paddingValues: PaddingValues) {
-        NavHost(navController = navController, startDestination = NavigationRoutes.TodayTabRoute.route) {
-            composable(NavigationRoutes.TodayTabRoute.route) { TodayScreen(paddingValues).CreateView() }
-            composable(NavigationRoutes.FutureTabRoute.route) {}
+    private fun NavGraph(paddingValues: PaddingValues) {
+        navController?.let { tempNavController ->
+
+            NavHost(navController = tempNavController,
+                startDestination = NavigationRoutes.TodayTabRoute.route) {
+
+                composable(NavigationRoutes.TodayTabRoute.route) {
+                    TodayScreen(paddingValues)
+                }
+
+                composable(NavigationRoutes.FutureTabRoute.route) {
+                    FutureScreen(paddingValues)
+                }
+            }
         }
     }
 
+
     @Composable
     fun TabLayout() {
-        var selectedTab by rememberSaveable { mutableIntStateOf(0) }
-        println(selectedTab)
         val tabsTitlesArray = stringArrayResource(id = R.array.tabsNames)
+
+        val selectedTab = mainViewModel?.selectedTab?.collectAsState()?.value
+            ?: NavigationIntRoutes.TodayTabRoute.route
 
         TabRow(selectedTabIndex = selectedTab,
             indicator = @Composable {
@@ -92,16 +112,16 @@ class MainActivity : ComponentActivity() {
             tabsTitlesArray.forEachIndexed { index, title ->
 
                 Tab(selected = selectedTab == index,
-                    onClick = { selectedTab = index },
+                    onClick = { tabOnClick(index) },
                     modifier = Modifier.background(MaterialTheme.colorScheme.primary)) {
                     Row(horizontalArrangement = Arrangement.Center,
                         modifier = Modifier.height(56.dp)) {
 
                         val tabIcon = when(index) {
-                            0 -> {
+                            NavigationIntRoutes.TodayTabRoute.route -> {
                                 painterResource(id = R.drawable.ic_sunny_24)
                             }
-                            1 -> {
+                            NavigationIntRoutes.FutureTabRoute.route -> {
                                 painterResource(id = R.drawable.ic_sunny_24)
                             }
 
@@ -124,6 +144,20 @@ class MainActivity : ComponentActivity() {
                             modifier = Modifier.align(alignment = Alignment.CenterVertically))
                     }
                 }
+            }
+        }
+    }
+
+    private fun tabOnClick(tabIndex: Int) {
+        when(tabIndex) {
+            NavigationIntRoutes.TodayTabRoute.route -> {
+                mainViewModel?.setSelectedTab(NavigationIntRoutes.TodayTabRoute.route)
+                navController?.navigate(NavigationRoutes.TodayTabRoute.route)
+            }
+
+            NavigationIntRoutes.FutureTabRoute.route -> {
+                mainViewModel?.setSelectedTab(NavigationIntRoutes.FutureTabRoute.route)
+                navController?.navigate(NavigationRoutes.FutureTabRoute.route)
             }
         }
     }
@@ -164,4 +198,20 @@ class MainActivity : ComponentActivity() {
          */
     }
 
+    private fun customOnBackPressed() {
+
+        navController?.let {  tempNavController ->
+
+            println(tempNavController.currentDestination?.route)
+
+            if (tempNavController.currentDestination?.route
+                == NavigationRoutes.TodayTabRoute.route) {
+                finish()
+            } else {
+                mainViewModel?.setSelectedTab(NavigationIntRoutes.TodayTabRoute.route)
+                tempNavController.popBackStack(NavigationRoutes.FutureTabRoute.route,
+                    true)
+            }
+        }
+    }
 }

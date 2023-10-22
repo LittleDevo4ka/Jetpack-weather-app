@@ -25,164 +25,164 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jetpackweatherapp.R
 import com.example.jetpackweatherapp.ui.theme.sunColor
+import com.example.jetpackweatherapp.viewModel.MainViewModel
 
-class TodayScreen(private val paddingValues: PaddingValues) {
+@Composable
+fun TodayScreen(paddingValues: PaddingValues) {
+    val mainViewModel: MainViewModel = viewModel()
 
-    @Composable
-    fun CreateView() {
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
-            .background(MaterialTheme.colorScheme.background)) {
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .padding(paddingValues)
+        .background(MaterialTheme.colorScheme.background)) {
 
-            CurrentWeatherCard()
-            FutureWeatherCards()
-            SunriseSunsetCard()
-            AdditionalInformationCard()
+        CurrentWeatherCard()
+        FutureWeatherCards()
+        SunriseSunsetCard()
+        AdditionalInformationCard()
 
-        }
     }
+}
 
-    @Composable
-    private fun CurrentWeatherCard() {
-        Box(modifier = Modifier
-            .fillMaxWidth()
-            .wrapContentHeight()
-            .padding(top = 22.dp, start = 16.dp, end = 16.dp)
-            .clip(RoundedCornerShape(15.dp))
-            .background(MaterialTheme.colorScheme.primary)) {
+@Composable
+private fun CurrentWeatherCard() {
+    Box(modifier = Modifier
+        .fillMaxWidth()
+        .wrapContentHeight()
+        .padding(top = 22.dp, start = 16.dp, end = 16.dp)
+        .clip(RoundedCornerShape(15.dp))
+        .background(MaterialTheme.colorScheme.primary)) {
 
-            Column {
+        Column {
 
-                Row(modifier = Modifier
-                    .wrapContentSize()
-                    .padding(top = 16.dp, start = 20.dp),
-                    verticalAlignment = Alignment.Bottom) {
+            Row(modifier = Modifier
+                .wrapContentSize()
+                .padding(top = 16.dp, start = 20.dp),
+                verticalAlignment = Alignment.Bottom) {
 
-                    Text(text = "Prague",
-                        fontSize = 16.sp)
+                Text(text = "Prague",
+                    fontSize = 16.sp)
 
-                    Text(text = "Thu, 07:13",
-                        fontSize = 12.sp,
-                        fontStyle = FontStyle.Normal,
-                        modifier = Modifier.padding(start = 16.dp))
-                }
-
-                Text(text = "10°",
-                    fontSize = 64.sp,
+                Text(text = "Thu, 07:13",
+                    fontSize = 12.sp,
                     fontStyle = FontStyle.Normal,
-                    modifier = Modifier.padding(top = 8.dp, start = 20.dp)
-                )
-
-                Text(text = "Feels like: 12°",
-                    fontSize = 16.sp,
-                    modifier = Modifier.padding(top = 8.dp, bottom = 16.dp, start = 20.dp))
+                    modifier = Modifier.padding(start = 16.dp))
             }
 
-            Icon(painter = painterResource(R.drawable.ic_sunny_24),
-                contentDescription = "Weather icon",
-                modifier = Modifier
-                    .size(120.dp)
-                    .padding(top = 24.dp, end = 28.dp)
-                    .align(Alignment.TopEnd),
-                tint = sunColor
+            Text(text = "10°",
+                fontSize = 64.sp,
+                fontStyle = FontStyle.Normal,
+                modifier = Modifier.padding(top = 8.dp, start = 20.dp)
             )
 
+            Text(text = "Feels like: 12°",
+                fontSize = 16.sp,
+                modifier = Modifier.padding(top = 8.dp, bottom = 16.dp, start = 20.dp))
         }
-    }
 
-    @Composable
-    private fun FutureWeatherCards() {
-        LazyRow(modifier = Modifier
-            .padding(top = 32.dp, start = 16.dp)){
-            items(10) {
-                WeatherListItem().CreateView()
-            }
-        }
-    }
-
-    @Composable
-    private fun SunriseSunsetCard() {
-        Row(verticalAlignment = Alignment.CenterVertically,
+        Icon(painter = painterResource(R.drawable.ic_sunny_24),
+            contentDescription = "Weather icon",
             modifier = Modifier
-                .padding(top = 20.dp, start = 16.dp, end = 16.dp)
-                .fillMaxWidth()
-                .height(72.dp)
-                .clip(RoundedCornerShape(15.dp))
-                .background(color = MaterialTheme.colorScheme.primary)) {
+                .size(120.dp)
+                .padding(top = 24.dp, end = 28.dp)
+                .align(Alignment.TopEnd),
+            tint = sunColor
+        )
 
-            Text(text = "Sunrise",
-                fontSize = 16.sp,
-                modifier = Modifier.padding(start = 20.dp))
+    }
+}
 
-            Icon(painter = painterResource(id = R.drawable.ic_sunny_24),
-                contentDescription = "Sunrise icon",
-                tint = sunColor,
-                modifier = Modifier.padding(start = 12.dp))
-
-            Text(text = "04:19",
-                fontSize = 12.sp,
-                fontStyle = FontStyle.Normal,
-                modifier = Modifier.padding(start = 4.dp))
-
-            Text(text = "Sunrise",
-                fontSize = 16.sp,
-                modifier = Modifier.padding(start = 40.dp))
-
-            Icon(painter = painterResource(id = R.drawable.ic_sunny_24),
-                contentDescription = "Sunrise icon",
-                tint = sunColor,
-                modifier = Modifier.padding(start = 12.dp))
-
-            Text(text = "04:19",
-                fontSize = 12.sp,
-                fontStyle = FontStyle.Normal,
-                modifier = Modifier.padding(start = 4.dp))
-
+@Composable
+private fun FutureWeatherCards() {
+    LazyRow(modifier = Modifier
+        .padding(top = 32.dp, start = 16.dp)){
+        items(10) {
+            WeatherListItem().CreateView()
         }
     }
+}
 
-    @Composable
-    private fun AdditionalInformationCard() {
-        Column(modifier = Modifier
-            .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+@Composable
+private fun SunriseSunsetCard() {
+    Row(verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .padding(top = 20.dp, start = 16.dp, end = 16.dp)
             .fillMaxWidth()
-            .wrapContentHeight()
+            .height(72.dp)
             .clip(RoundedCornerShape(15.dp))
             .background(color = MaterialTheme.colorScheme.primary)) {
 
-            Row(modifier = Modifier.padding(top = 16.dp, start = 24.dp)) {
-                Text(text = "Atmospheric pressure:",
-                    fontSize = 12.sp,
-                    fontStyle = FontStyle.Normal)
+        Text(text = "Sunrise",
+            fontSize = 16.sp,
+            modifier = Modifier.padding(start = 20.dp))
 
-                Text(text = "1000 hPa",
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(start = 4.dp))
-            }
+        Icon(painter = painterResource(id = R.drawable.ic_sunny_24),
+            contentDescription = "Sunrise icon",
+            tint = sunColor,
+            modifier = Modifier.padding(start = 12.dp))
 
-            Row(modifier = Modifier.padding(top = 16.dp, start = 24.dp)) {
-                Text(text = "Cloud cover:",
-                    fontSize = 12.sp,
-                    fontStyle = FontStyle.Normal)
+        Text(text = "04:19",
+            fontSize = 12.sp,
+            fontStyle = FontStyle.Normal,
+            modifier = Modifier.padding(start = 4.dp))
 
-                Text(text = "100%",
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(start = 4.dp))
-            }
+        Text(text = "Sunrise",
+            fontSize = 16.sp,
+            modifier = Modifier.padding(start = 40.dp))
 
-            Row(modifier = Modifier.padding(top = 16.dp, start = 24.dp)) {
-                Text(text = "Visibility:",
-                    fontSize = 12.sp,
-                    fontStyle = FontStyle.Normal)
+        Icon(painter = painterResource(id = R.drawable.ic_sunny_24),
+            contentDescription = "Sunrise icon",
+            tint = sunColor,
+            modifier = Modifier.padding(start = 12.dp))
 
-                Text(text = "10000 m",
-                    fontSize = 12.sp,
-                    modifier = Modifier.padding(start = 4.dp, bottom = 16.dp))
-            }
+        Text(text = "04:19",
+            fontSize = 12.sp,
+            fontStyle = FontStyle.Normal,
+            modifier = Modifier.padding(start = 4.dp))
+
+    }
+}
+
+@Composable
+private fun AdditionalInformationCard() {
+    Column(modifier = Modifier
+        .padding(top = 16.dp, start = 16.dp, end = 16.dp)
+        .fillMaxWidth()
+        .wrapContentHeight()
+        .clip(RoundedCornerShape(15.dp))
+        .background(color = MaterialTheme.colorScheme.primary)) {
+
+        Row(modifier = Modifier.padding(top = 16.dp, start = 24.dp)) {
+            Text(text = "Atmospheric pressure:",
+                fontSize = 12.sp,
+                fontStyle = FontStyle.Normal)
+
+            Text(text = "1000 hPa",
+                fontSize = 12.sp,
+                modifier = Modifier.padding(start = 4.dp))
+        }
+
+        Row(modifier = Modifier.padding(top = 16.dp, start = 24.dp)) {
+            Text(text = "Cloud cover:",
+                fontSize = 12.sp,
+                fontStyle = FontStyle.Normal)
+
+            Text(text = "100%",
+                fontSize = 12.sp,
+                modifier = Modifier.padding(start = 4.dp))
+        }
+
+        Row(modifier = Modifier.padding(top = 16.dp, start = 24.dp)) {
+            Text(text = "Visibility:",
+                fontSize = 12.sp,
+                fontStyle = FontStyle.Normal)
+
+            Text(text = "10000 m",
+                fontSize = 12.sp,
+                modifier = Modifier.padding(start = 4.dp, bottom = 16.dp))
         }
     }
-
 }

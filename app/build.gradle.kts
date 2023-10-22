@@ -73,4 +73,7 @@ dependencies {
 
     val activityVersion = "1.8.0"
     implementation("androidx.activity:activity-ktx:$activityVersion")
+
+    //viewModel
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
 }
