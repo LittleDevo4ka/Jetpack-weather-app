@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -16,19 +15,21 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.selection.LocalTextSelectionColors
+import androidx.compose.foundation.text.selection.TextSelectionColors
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
@@ -37,6 +38,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jetpackweatherapp.R
 import com.example.jetpackweatherapp.ui.theme.grayColor59
+import com.example.jetpackweatherapp.ui.theme.morningColor
 import com.example.jetpackweatherapp.ui.theme.sunColor
 import com.example.jetpackweatherapp.viewModel.MainViewModel
 
@@ -87,7 +89,10 @@ private fun CityTextField() {
                 unfocusedIndicatorColor = Color.Transparent,
                 cursorColor = Color.Black,
                 focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black))
+                unfocusedTextColor = Color.Black,
+                selectionColors = TextSelectionColors(handleColor = morningColor,
+                    backgroundColor = morningColor)
+            ))
 }
 
 @Composable
@@ -126,7 +131,7 @@ private fun CurrentWeatherCard() {
                 modifier = Modifier.padding(top = 8.dp, bottom = 16.dp, start = 20.dp))
         }
 
-        Icon(painter = painterResource(R.drawable.ic_sunny_24),
+        Icon(painter = painterResource(R.drawable.ic_sunny_filled_24),
             contentDescription = "Weather icon",
             modifier = Modifier
                 .size(120.dp)
@@ -141,9 +146,10 @@ private fun CurrentWeatherCard() {
 @Composable
 private fun FutureWeatherCards() {
     LazyRow(modifier = Modifier
-        .padding(top = 32.dp, start = 16.dp)){
+        .padding(top = 32.dp),
+        contentPadding = PaddingValues(start = 16.dp, end = 8.dp)){
         items(10) {
-            WeatherListItem().CreateView()
+            WeatherListItem()
         }
     }
 }
@@ -162,7 +168,7 @@ private fun SunriseSunsetCard() {
             fontSize = 16.sp,
             modifier = Modifier.padding(start = 20.dp))
 
-        Icon(painter = painterResource(id = R.drawable.ic_sunny_24),
+        Icon(painter = painterResource(id = R.drawable.ic_sunny_filled_24),
             contentDescription = "Sunrise icon",
             tint = sunColor,
             modifier = Modifier.padding(start = 12.dp))
@@ -176,7 +182,7 @@ private fun SunriseSunsetCard() {
             fontSize = 16.sp,
             modifier = Modifier.padding(start = 40.dp))
 
-        Icon(painter = painterResource(id = R.drawable.ic_sunny_24),
+        Icon(painter = painterResource(id = R.drawable.ic_sunny_filled_24),
             contentDescription = "Sunrise icon",
             tint = sunColor,
             modifier = Modifier.padding(start = 12.dp))

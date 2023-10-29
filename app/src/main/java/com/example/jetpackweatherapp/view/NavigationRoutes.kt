@@ -1,11 +1,17 @@
 package com.example.jetpackweatherapp.view
 
-sealed class NavigationRoutes(val route: String) {
-    object TodayTabRoute: NavigationRoutes("todayTabScreen")
-    object FutureTabRoute: NavigationRoutes("futureTabScreen")
+import com.example.jetpackweatherapp.R
+
+sealed class NavigationRoute(val route: String) {
+    object TodayRoute: NavigationRoute("todayTabScreen")
+    object FutureRoute: NavigationRoute("futureTabScreen")
 }
 
-sealed class NavigationIntRoutes(val route: Int) {
-    object TodayTabRoute: NavigationIntRoutes(0)
-    object FutureTabRoute: NavigationIntRoutes(1)
+sealed class BottomNavigationTab(val route: NavigationRoute, val tabIndex: Int,
+                                 val icon: Int, val filledIcon: Int, val title: Int) {
+    object TodayTabRoute: BottomNavigationTab(NavigationRoute.TodayRoute, 0,
+        R.drawable.ic_sunny_24, R.drawable.ic_sunny_filled_24, R.string.TodayTabName)
+
+    object FutureTabRoute: BottomNavigationTab(NavigationRoute.FutureRoute, 1,
+        R.drawable.ic_date_range_24, R.drawable.ic_date_range_filled_24, R.string.FutureTabName)
 }

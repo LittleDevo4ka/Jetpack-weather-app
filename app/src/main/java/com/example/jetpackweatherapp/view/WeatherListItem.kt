@@ -20,56 +20,54 @@ import com.example.jetpackweatherapp.R
 import com.example.jetpackweatherapp.ui.theme.morningColor
 import com.example.jetpackweatherapp.ui.theme.sunColor
 
-class WeatherListItem {
 
-    @Composable
-    fun CreateView() {
-        Card(modifier = Modifier
-            .size(width = 90.dp, height = 158.dp)
-            .padding(end = 8.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.Black
-            )) {
+@Composable
+fun WeatherListItem() {
+    Card(modifier = Modifier
+        .size(width = 90.dp, height = 158.dp)
+        .padding(end = 8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primary,
+            contentColor = Color.Black
+        )) {
 
-            Text(text = "07:00",
+        Text(text = "07:00",
+            fontSize = 16.sp,
+            fontStyle = FontStyle.Normal,
+            modifier = Modifier
+                .align(alignment = Alignment.CenterHorizontally)
+                .padding(top = 8.dp))
+
+        Icon(painter = painterResource(id = R.drawable.ic_sunny_filled_24),
+            contentDescription = "Weather icon",
+            tint = sunColor,
+            modifier = Modifier
+                .padding(top = 20.dp)
+                .align(alignment = Alignment.CenterHorizontally)
+                .size(48.dp))
+
+        Text(text = "10°",
+            fontSize = 16.sp,
+            modifier = Modifier
+                .padding(top = 4.dp)
+                .align(alignment = Alignment.CenterHorizontally))
+
+        Row(modifier = Modifier
+            .padding(top = 6.dp, end = 8.dp)
+            .align(alignment = Alignment.CenterHorizontally),
+            verticalAlignment = Alignment.CenterVertically) {
+
+            Icon(painter = painterResource(id = R.drawable.ic_humidity_24),
+                contentDescription = "Humidity icon",
+                tint = morningColor,
+                modifier = Modifier
+                    .size(16.dp))
+
+            Text(text = "60%",
                 fontSize = 16.sp,
-                fontStyle = FontStyle.Normal,
-                modifier = Modifier
-                    .align(alignment = Alignment.CenterHorizontally)
-                    .padding(top = 8.dp))
-
-            Icon(painter = painterResource(id = R.drawable.ic_sunny_24),
-                contentDescription = "Weather icon",
-                tint = sunColor,
-                modifier = Modifier
-                    .padding(top = 20.dp)
-                    .align(alignment = Alignment.CenterHorizontally)
-                    .size(48.dp))
-
-            Text(text = "10°",
-                fontSize = 16.sp,
-                modifier = Modifier
-                    .padding(top = 4.dp)
-                    .align(alignment = Alignment.CenterHorizontally))
-
-            Row(modifier = Modifier
-                .padding(top = 6.dp, end = 8.dp)
-                .align(alignment = Alignment.CenterHorizontally),
-                verticalAlignment = Alignment.CenterVertically) {
-
-                Icon(painter = painterResource(id = R.drawable.ic_humidity_24),
-                    contentDescription = "Humidity icon",
-                    tint = morningColor,
-                    modifier = Modifier
-                        .size(16.dp))
-
-                Text(text = "60%",
-                    fontSize = 16.sp,
-                    fontStyle = FontStyle.Normal)
-            }
-
-
+                fontStyle = FontStyle.Normal)
         }
+
+
     }
 }

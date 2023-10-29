@@ -6,6 +6,9 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -32,7 +35,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -40,7 +42,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.jetpackweatherapp.R
 import com.example.jetpackweatherapp.ui.theme.JetpackWeatherAppTheme
 import com.example.jetpackweatherapp.viewModel.MainViewModel
 
@@ -79,13 +80,23 @@ class MainActivity : ComponentActivity() {
         navController?.let { tempNavController ->
 
             NavHost(navController = tempNavController,
-                startDestination = NavigationRoutes.TodayTabRoute.route) {
+                startDestination = NavigationRoute.TodayRoute.route) {
 
-                composable(NavigationRoutes.TodayTabRoute.route) {
+                composable(NavigationRoute.TodayRoute.route,
+                    enterTransition = { fadeIn(animationSpec = tween(durationMillis = 300)) },
+                    exitTransition = { fadeOut(animationSpec = tween(durationMillis = 300)) },
+                    popEnterTransition = { fadeIn(animationSpec = tween(durationMillis = 300)) },
+                    popExitTransition = { fadeOut(animationSpec = tween(durationMillis = 300)) }) {
+
                     TodayScreen(paddingValues)
                 }
 
-                composable(NavigationRoutes.FutureTabRoute.route) {
+                composable(NavigationRoute.FutureRoute.route,
+                    enterTransition = { fadeIn(animationSpec = tween(durationMillis = 300)) },
+                    exitTransition = { fadeOut(animationSpec = tween(durationMillis = 300)) },
+                    popEnterTransition = { fadeIn(animationSpec = tween(durationMillis = 300)) },
+                    popExitTransition = { fadeOut(animationSpec = tween(durationMillis = 300)) }) {
+
                     FutureScreen(paddingValues)
                 }
             }
@@ -95,10 +106,11 @@ class MainActivity : ComponentActivity() {
 
     @Composable
     fun TabLayout() {
-        val tabsTitlesArray = stringArrayResource(id = R.array.tabsNames)
+        val tabsArray: List<BottomNavigationTab> =
+            listOf(BottomNavigationTab.TodayTabRoute, BottomNavigationTab.FutureTabRoute)
 
         val selectedTab = mainViewModel?.selectedTab?.collectAsState()?.value
-            ?: NavigationIntRoutes.TodayTabRoute.route
+            ?: BottomNavigationTab.TodayTabRoute.tabIndex
 
         TabRow(selectedTabIndex = selectedTab,
             indicator = @Composable {
@@ -109,7 +121,7 @@ class MainActivity : ComponentActivity() {
                 .wrapContentHeight()
                 .systemBarsPadding()) {
 
-            tabsTitlesArray.forEachIndexed { index, title ->
+            tabsArray.forEachIndexed { index, tabInfo ->
 
                 Tab(selected = selectedTab == index,
                     onClick = { tabOnClick(index) },
@@ -117,18 +129,12 @@ class MainActivity : ComponentActivity() {
                     Row(horizontalArrangement = Arrangement.Center,
                         modifier = Modifier.height(56.dp)) {
 
-                        val tabIcon = when(index) {
-                            NavigationIntRoutes.TodayTabRoute.route -> {
-                                painterResource(id = R.drawable.ic_sunny_24)
-                            }
-                            NavigationIntRoutes.FutureTabRoute.route -> {
-                                painterResource(id = R.drawable.ic_sunny_24)
-                            }
-
-                            else -> {
-                                painterResource(id = R.drawable.ic_sunny_24)
-                            }
+                        val tabIcon = if (index == selectedTab) {
+                            painterResource(id = tabInfo.filledIcon)
+                        } else {
+                            painterResource(id = tabInfo.icon)
                         }
+
 
                         Icon(painter = tabIcon,
                             contentDescription = "Tab icon",
@@ -137,7 +143,7 @@ class MainActivity : ComponentActivity() {
                                 .padding(end = 4.dp)
                                 .align(alignment = Alignment.CenterVertically))
 
-                        Text(text = title,
+                        Text(text = getString(tabInfo.title),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                             color = Color.Black,
@@ -149,15 +155,22 @@ class MainActivity : ComponentActivity() {
     }
 
     private fun tabOnClick(tabIndex: Int) {
+
         when(tabIndex) {
-            NavigationIntRoutes.TodayTabRoute.route -> {
-                mainViewModel?.setSelectedTab(NavigationIntRoutes.TodayTabRoute.route)
-                navController?.navigate(NavigationRoutes.TodayTabRoute.route)
+            BottomNavigationTab.TodayTabRoute.tabIndex -> {
+                if (navController?.currentDestination?.route != NavigationRoute.TodayRoute.route) {
+                    mainViewModel?.setSelectedTab(BottomNavigationTab.TodayTabRoute.tabIndex)
+                    navController?.navigate(NavigationRoute.TodayRoute.route)
+                }
+
             }
 
-            NavigationIntRoutes.FutureTabRoute.route -> {
-                mainViewModel?.setSelectedTab(NavigationIntRoutes.FutureTabRoute.route)
-                navController?.navigate(NavigationRoutes.FutureTabRoute.route)
+            BottomNavigationTab.FutureTabRoute.tabIndex -> {
+
+                if (navController?.currentDestination?.route != NavigationRoute.FutureRoute.route) {
+                    mainViewModel?.setSelectedTab(BottomNavigationTab.FutureTabRoute.tabIndex)
+                    navController?.navigate(NavigationRoute.FutureRoute.route)
+                }
             }
         }
     }
@@ -205,11 +218,11 @@ class MainActivity : ComponentActivity() {
             println(tempNavController.currentDestination?.route)
 
             if (tempNavController.currentDestination?.route
-                == NavigationRoutes.TodayTabRoute.route) {
+                == NavigationRoute.TodayRoute.route) {
                 finish()
             } else {
-                mainViewModel?.setSelectedTab(NavigationIntRoutes.TodayTabRoute.route)
-                tempNavController.popBackStack(NavigationRoutes.FutureTabRoute.route,
+                mainViewModel?.setSelectedTab(BottomNavigationTab.TodayTabRoute.tabIndex)
+                tempNavController.popBackStack(NavigationRoute.FutureRoute.route,
                     true)
             }
         }
