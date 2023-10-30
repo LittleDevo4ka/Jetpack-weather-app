@@ -28,7 +28,7 @@ fun WeatherListItem() {
         .padding(end = 8.dp),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.primary,
-            contentColor = Color.Black
+            contentColor = MaterialTheme.colorScheme.onPrimary
         )) {
 
         Text(text = "07:00",

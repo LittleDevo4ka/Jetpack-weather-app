@@ -19,6 +19,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FabPosition
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -51,12 +55,11 @@ class MainActivity : ComponentActivity() {
     private var navController: NavHostController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         setContent {
-            JetpackWeatherAppTheme(darkTheme = false) {
-                ChangeSystemBarsTheme(isSystemInDarkTheme())
+            JetpackWeatherAppTheme() {
+                ChangeSystemBarsTheme(!isSystemInDarkTheme())
                 navController = rememberNavController()
                 mainViewModel = viewModel()
 
@@ -116,7 +119,7 @@ class MainActivity : ComponentActivity() {
             indicator = @Composable {
                 TabRowDefaults.Indicator(
                     Modifier.tabIndicatorOffset(it[selectedTab]),
-                    color = Color.Black) },
+                    color = MaterialTheme.colorScheme.onPrimary) },
             modifier = Modifier
                 .wrapContentHeight()
                 .systemBarsPadding()) {
@@ -138,7 +141,7 @@ class MainActivity : ComponentActivity() {
 
                         Icon(painter = tabIcon,
                             contentDescription = "Tab icon",
-                            tint = Color.Black,
+                            tint = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier
                                 .padding(end = 4.dp)
                                 .align(alignment = Alignment.CenterVertically))
@@ -146,7 +149,7 @@ class MainActivity : ComponentActivity() {
                         Text(text = getString(tabInfo.title),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
-                            color = Color.Black,
+                            color = MaterialTheme.colorScheme.onPrimary,
                             modifier = Modifier.align(alignment = Alignment.CenterVertically))
                     }
                 }
@@ -180,13 +183,7 @@ class MainActivity : ComponentActivity() {
         val barColor = MaterialTheme.colorScheme.background.toArgb()
 
         LaunchedEffect(lightTheme) {
-            enableEdgeToEdge(
-                statusBarStyle = SystemBarStyle.light(barColor, barColor),
-                navigationBarStyle = SystemBarStyle.light(barColor, barColor)
-            )
-        }
-        /*
-        LaunchedEffect(lightTheme) {
+
             if (lightTheme) {
                 enableEdgeToEdge(
                     statusBarStyle = SystemBarStyle.light(
@@ -207,15 +204,11 @@ class MainActivity : ComponentActivity() {
                 )
             }
         }
-
-         */
     }
 
     private fun customOnBackPressed() {
 
         navController?.let {  tempNavController ->
-
-            println(tempNavController.currentDestination?.route)
 
             if (tempNavController.currentDestination?.route
                 == NavigationRoute.TodayRoute.route) {

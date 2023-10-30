@@ -70,7 +70,8 @@ private fun CityTextField() {
         value = textFieldStr.value,
         onValueChange = { textFieldStr.value = it},
         shape = RoundedCornerShape(10.dp),
-        placeholder = { Text(text = "Russia, Moscow", color = grayColor59, fontSize = 16.sp)},
+        placeholder = { Text(text = "Russia, Moscow", color = MaterialTheme.colorScheme.onSecondary,
+            fontSize = 16.sp)},
         singleLine = true,
         textStyle = TextStyle(fontSize = 16.sp),
         colors = TextFieldDefaults
@@ -79,9 +80,9 @@ private fun CityTextField() {
                 focusedIndicatorColor = Color.Transparent,
                 disabledIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = Color.Black,
-                focusedTextColor = Color.Black,
-                unfocusedTextColor = Color.Black,
+                cursorColor = MaterialTheme.colorScheme.onPrimary,
+                focusedTextColor = MaterialTheme.colorScheme.onPrimary,
+                unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
                 selectionColors = TextSelectionColors(handleColor = morningColor,
                     backgroundColor = morningColor)
             ))
