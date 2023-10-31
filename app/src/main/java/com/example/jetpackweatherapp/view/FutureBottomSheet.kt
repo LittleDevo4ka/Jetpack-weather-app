@@ -15,101 +15,52 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.text.selection.TextSelectionColors
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.MutableState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jetpackweatherapp.R
-import com.example.jetpackweatherapp.ui.theme.morningColor
 import com.example.jetpackweatherapp.ui.theme.sunColor
-import com.example.jetpackweatherapp.viewModel.MainViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TodayScreen(paddingValues: PaddingValues) {
-    val mainViewModel: MainViewModel = viewModel()
+fun FutureBottomSheet(showBottomSheet: MutableState<Boolean>) {
+    val sheetState = rememberModalBottomSheetState()
 
-    Column(modifier = Modifier
-        .fillMaxSize()
-        .background(MaterialTheme.colorScheme.background)) {
+    ModalBottomSheet(
+        onDismissRequest = {
+            showBottomSheet.value = false
+        },
+        sheetState = sheetState,
+        containerColor = MaterialTheme.colorScheme.background
+    ) {
 
         LazyColumn(modifier = Modifier
-            .fillMaxSize(),
-            contentPadding = paddingValues){
+            .fillMaxSize()){
 
             item {
-                CityTextField()
-                CurrentWeatherCard()
-                FutureWeatherCards()
-                SunriseSunsetCard()
-                AdditionalInformationCard()
+                BottomSheetWeatherCard()
+                BottomSheetWeatherCards()
+                BottomSheetSunriseSunsetCard()
+                BottomSheetAdditionalInformationCard()
             }
         }
-
     }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
-private fun CityTextField() {
-
-    val textFieldStr = rememberSaveable{ mutableStateOf("") }
-    val keyboardController = LocalSoftwareKeyboardController.current
-
-    TextField(modifier = Modifier
-        .fillMaxWidth()
-        .wrapContentHeight()
-        .padding(top = 16.dp, start = 16.dp, end = 16.dp),
-        value = textFieldStr.value,
-        onValueChange = { textFieldStr.value = it},
-        shape = RoundedCornerShape(10.dp),
-        placeholder = { Text(text = "Russia, Moscow", color = MaterialTheme.colorScheme.onSecondary,
-            fontSize = 16.sp)},
-        singleLine = true,
-        textStyle = TextStyle(fontSize = 16.sp),
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Text,
-            imeAction = ImeAction.Search
-        ),
-        keyboardActions = KeyboardActions(
-            onSearch = { keyboardController?.hide() }
-        ),
-        colors = TextFieldDefaults
-            .colors(focusedContainerColor = MaterialTheme.colorScheme.primary,
-                unfocusedContainerColor = MaterialTheme.colorScheme.primary,
-                focusedIndicatorColor = Color.Transparent,
-                disabledIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent,
-                cursorColor = MaterialTheme.colorScheme.onPrimary,
-                focusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                unfocusedTextColor = MaterialTheme.colorScheme.onPrimary,
-                selectionColors = TextSelectionColors(handleColor = morningColor,
-                    backgroundColor = morningColor)
-            ))
-}
-
-@Composable
-private fun CurrentWeatherCard() {
+private fun BottomSheetWeatherCard() {
     Box(modifier = Modifier
         .fillMaxWidth()
         .wrapContentHeight()
@@ -157,10 +108,11 @@ private fun CurrentWeatherCard() {
 }
 
 @Composable
-private fun FutureWeatherCards() {
+private fun BottomSheetWeatherCards() {
     LazyRow(modifier = Modifier
         .padding(top = 32.dp),
-        contentPadding = PaddingValues(start = 16.dp, end = 8.dp)){
+        contentPadding = PaddingValues(start = 16.dp, end = 8.dp)
+    ){
         items(10) {
             WeatherListItem()
         }
@@ -168,7 +120,7 @@ private fun FutureWeatherCards() {
 }
 
 @Composable
-private fun SunriseSunsetCard() {
+private fun BottomSheetSunriseSunsetCard() {
     Row(verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .padding(top = 20.dp, start = 16.dp, end = 16.dp)
@@ -209,7 +161,7 @@ private fun SunriseSunsetCard() {
 }
 
 @Composable
-private fun AdditionalInformationCard() {
+private fun BottomSheetAdditionalInformationCard() {
     Column(modifier = Modifier
         .padding(top = 16.dp, start = 16.dp, end = 16.dp)
         .fillMaxWidth()
