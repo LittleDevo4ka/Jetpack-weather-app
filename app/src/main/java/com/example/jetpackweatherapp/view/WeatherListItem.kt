@@ -17,12 +17,14 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpackweatherapp.R
+import com.example.jetpackweatherapp.model.dataClass.forecastWeather.ForecastWeatherItem
 import com.example.jetpackweatherapp.ui.theme.morningColor
 import com.example.jetpackweatherapp.ui.theme.sunColor
+import kotlin.math.round
 
 
 @Composable
-fun WeatherListItem() {
+fun WeatherListItem(forecastWeatherItem: ForecastWeatherItem) {
     Card(modifier = Modifier
         .size(width = 90.dp, height = 158.dp)
         .padding(end = 8.dp),
@@ -31,7 +33,7 @@ fun WeatherListItem() {
             contentColor = MaterialTheme.colorScheme.onPrimary
         )) {
 
-        Text(text = "07:00",
+        Text(text = forecastWeatherItem.dt_txt,
             fontSize = 16.sp,
             fontStyle = FontStyle.Normal,
             modifier = Modifier
@@ -46,7 +48,7 @@ fun WeatherListItem() {
                 .align(alignment = Alignment.CenterHorizontally)
                 .size(48.dp))
 
-        Text(text = "10°",
+        Text(text = "${round(forecastWeatherItem.main.temp).toInt()}°",
             fontSize = 16.sp,
             modifier = Modifier
                 .padding(top = 4.dp)
@@ -63,7 +65,7 @@ fun WeatherListItem() {
                 modifier = Modifier
                     .size(16.dp))
 
-            Text(text = "60%",
+            Text(text = "${forecastWeatherItem.main.humidity}%",
                 fontSize = 16.sp,
                 fontStyle = FontStyle.Normal)
         }

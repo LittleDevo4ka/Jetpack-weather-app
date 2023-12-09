@@ -114,7 +114,7 @@ private fun BottomSheetWeatherCards() {
         contentPadding = PaddingValues(start = 16.dp, end = 8.dp)
     ){
         items(10) {
-            WeatherListItem()
+            //WeatherListItem()
         }
     }
 }

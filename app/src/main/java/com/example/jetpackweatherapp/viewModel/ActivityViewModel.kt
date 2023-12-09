@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+class ActivityViewModel(application: Application) : AndroidViewModel(application) {
 
     private val mutableSelectedTab: MutableStateFlow<Int> =
         MutableStateFlow(BottomNavigationTab.TodayTabRoute.tabIndex)

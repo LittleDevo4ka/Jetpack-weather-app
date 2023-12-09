@@ -42,11 +42,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jetpackweatherapp.R
 import com.example.jetpackweatherapp.ui.theme.morningColor
 import com.example.jetpackweatherapp.ui.theme.sunColor
-import com.example.jetpackweatherapp.viewModel.MainViewModel
+import com.example.jetpackweatherapp.viewModel.TodayViewModel
 
 @Composable
 fun FutureScreen(paddingValues: PaddingValues) {
-    val mainViewModel: MainViewModel = viewModel()
+    val todayViewModel: TodayViewModel = viewModel()
 
     LazyColumn(modifier = Modifier
         .fillMaxSize()

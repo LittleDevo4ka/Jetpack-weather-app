@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -24,6 +25,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -41,13 +43,20 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jetpackweatherapp.R
+import com.example.jetpackweatherapp.model.dataClass.currentWeather.CurrentWeather
+import com.example.jetpackweatherapp.model.dataClass.forecastWeather.ForecastWeatherItem
 import com.example.jetpackweatherapp.ui.theme.morningColor
 import com.example.jetpackweatherapp.ui.theme.sunColor
-import com.example.jetpackweatherapp.viewModel.MainViewModel
+import com.example.jetpackweatherapp.viewModel.TodayViewModel
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import kotlin.math.round
 
 @Composable
 fun TodayScreen(paddingValues: PaddingValues) {
-    val mainViewModel: MainViewModel = viewModel()
+    val todayViewModel: TodayViewModel = viewModel()
+    val uiState = todayViewModel.todayUiState.collectAsState()
 
     Column(modifier = Modifier
         .fillMaxSize()
@@ -58,11 +67,17 @@ fun TodayScreen(paddingValues: PaddingValues) {
             contentPadding = paddingValues){
 
             item {
+
                 CityTextField()
-                CurrentWeatherCard()
-                FutureWeatherCards()
-                SunriseSunsetCard()
-                AdditionalInformationCard()
+
+                val currentWeather = uiState.value.currentWeather
+
+                currentWeather?.let {
+                    CurrentWeatherCard(it, todayViewModel)
+                    FutureWeatherCards(uiState.value.currentForecastWeatherList, todayViewModel)
+                    SunriseSunsetCard(it, todayViewModel)
+                    AdditionalInformationCard(it, todayViewModel)
+                }
             }
         }
 
@@ -109,7 +124,8 @@ private fun CityTextField() {
 }
 
 @Composable
-private fun CurrentWeatherCard() {
+private fun CurrentWeatherCard(currentWeather: CurrentWeather, todayViewModel: TodayViewModel) {
+
     Box(modifier = Modifier
         .fillMaxWidth()
         .wrapContentHeight()
@@ -124,22 +140,23 @@ private fun CurrentWeatherCard() {
                 .padding(top = 16.dp, start = 20.dp),
                 verticalAlignment = Alignment.Bottom) {
 
-                Text(text = "Prague",
+                Text(text = currentWeather.name,
                     fontSize = 16.sp)
 
-                Text(text = "Thu, 07:13",
+
+                Text(text = currentWeather.dt_txt,
                     fontSize = 12.sp,
                     fontStyle = FontStyle.Normal,
                     modifier = Modifier.padding(start = 16.dp))
             }
 
-            Text(text = "10°",
+            Text(text = "${round(currentWeather.main.temp).toInt()}°",
                 fontSize = 64.sp,
                 fontStyle = FontStyle.Normal,
                 modifier = Modifier.padding(top = 8.dp, start = 20.dp)
             )
 
-            Text(text = "Feels like: 12°",
+            Text(text = "Feels like: ${round(currentWeather.main.temp).toInt()}°",
                 fontSize = 16.sp,
                 modifier = Modifier.padding(top = 8.dp, bottom = 16.dp, start = 20.dp))
         }
@@ -157,18 +174,19 @@ private fun CurrentWeatherCard() {
 }
 
 @Composable
-private fun FutureWeatherCards() {
+private fun FutureWeatherCards(currentForecastWeatherList: ArrayList<ForecastWeatherItem>,
+                               todayViewModel: TodayViewModel) {
     LazyRow(modifier = Modifier
         .padding(top = 32.dp),
         contentPadding = PaddingValues(start = 16.dp, end = 8.dp)){
-        items(10) {
-            WeatherListItem()
+        items(currentForecastWeatherList.size) {
+            WeatherListItem(currentForecastWeatherList[it])
         }
     }
 }
 
 @Composable
-private fun SunriseSunsetCard() {
+private fun SunriseSunsetCard(currentWeather: CurrentWeather, todayViewModel: TodayViewModel) {
     Row(verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .padding(top = 20.dp, start = 16.dp, end = 16.dp)
@@ -186,7 +204,11 @@ private fun SunriseSunsetCard() {
             tint = sunColor,
             modifier = Modifier.padding(start = 12.dp))
 
-        Text(text = "04:19",
+        val sunDateFormat = SimpleDateFormat("HH:mm", Locale("en"))
+        val sunriseStr = dtToTxt(currentWeather.sys.sunrise * 1000L, sunDateFormat)
+        val sunsetStr = dtToTxt(currentWeather.sys.sunset * 1000L, sunDateFormat)
+
+        Text(text = sunriseStr,
             fontSize = 12.sp,
             fontStyle = FontStyle.Normal,
             modifier = Modifier.padding(start = 4.dp))
@@ -200,7 +222,7 @@ private fun SunriseSunsetCard() {
             tint = sunColor,
             modifier = Modifier.padding(start = 12.dp))
 
-        Text(text = "04:19",
+        Text(text = sunsetStr,
             fontSize = 12.sp,
             fontStyle = FontStyle.Normal,
             modifier = Modifier.padding(start = 4.dp))
@@ -209,7 +231,10 @@ private fun SunriseSunsetCard() {
 }
 
 @Composable
-private fun AdditionalInformationCard() {
+private fun AdditionalInformationCard(
+    currentWeather: CurrentWeather,
+    todayViewModel: TodayViewModel
+) {
     Column(modifier = Modifier
         .padding(top = 16.dp, start = 16.dp, end = 16.dp)
         .fillMaxWidth()
@@ -222,7 +247,7 @@ private fun AdditionalInformationCard() {
                 fontSize = 12.sp,
                 fontStyle = FontStyle.Normal)
 
-            Text(text = "1000 hPa",
+            Text(text = "${currentWeather.main.pressure} hPa",
                 fontSize = 12.sp,
                 modifier = Modifier.padding(start = 4.dp))
         }
@@ -232,7 +257,7 @@ private fun AdditionalInformationCard() {
                 fontSize = 12.sp,
                 fontStyle = FontStyle.Normal)
 
-            Text(text = "100%",
+            Text(text = "${currentWeather.clouds.all}%",
                 fontSize = 12.sp,
                 modifier = Modifier.padding(start = 4.dp))
         }
@@ -242,9 +267,14 @@ private fun AdditionalInformationCard() {
                 fontSize = 12.sp,
                 fontStyle = FontStyle.Normal)
 
-            Text(text = "10000 m",
+            Text(text = "${currentWeather.visibility} m",
                 fontSize = 12.sp,
                 modifier = Modifier.padding(start = 4.dp, bottom = 16.dp))
         }
     }
+}
+
+private fun dtToTxt(dt: Long, tempFormat: SimpleDateFormat): String {
+    val date = Date(dt)
+    return tempFormat.format(date)
 }

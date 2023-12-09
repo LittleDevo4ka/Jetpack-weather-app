@@ -19,10 +19,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material3.FabPosition
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -36,7 +32,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -47,11 +42,12 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.jetpackweatherapp.ui.theme.JetpackWeatherAppTheme
-import com.example.jetpackweatherapp.viewModel.MainViewModel
+import com.example.jetpackweatherapp.viewModel.ActivityViewModel
+import com.example.jetpackweatherapp.viewModel.TodayViewModel
 
 class MainActivity : ComponentActivity() {
 
-    private var mainViewModel: MainViewModel? = null
+    private var activityViewModel: ActivityViewModel? = null
     private var navController: NavHostController? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,7 +57,7 @@ class MainActivity : ComponentActivity() {
             JetpackWeatherAppTheme() {
                 ChangeSystemBarsTheme(!isSystemInDarkTheme())
                 navController = rememberNavController()
-                mainViewModel = viewModel()
+                activityViewModel = viewModel()
 
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
@@ -112,7 +108,7 @@ class MainActivity : ComponentActivity() {
         val tabsArray: List<BottomNavigationTab> =
             listOf(BottomNavigationTab.TodayTabRoute, BottomNavigationTab.FutureTabRoute)
 
-        val selectedTab = mainViewModel?.selectedTab?.collectAsState()?.value
+        val selectedTab = activityViewModel?.selectedTab?.collectAsState()?.value
             ?: BottomNavigationTab.TodayTabRoute.tabIndex
 
         TabRow(selectedTabIndex = selectedTab,
@@ -162,7 +158,7 @@ class MainActivity : ComponentActivity() {
         when(tabIndex) {
             BottomNavigationTab.TodayTabRoute.tabIndex -> {
                 if (navController?.currentDestination?.route != NavigationRoute.TodayRoute.route) {
-                    mainViewModel?.setSelectedTab(BottomNavigationTab.TodayTabRoute.tabIndex)
+                    activityViewModel?.setSelectedTab(BottomNavigationTab.TodayTabRoute.tabIndex)
                     navController?.navigate(NavigationRoute.TodayRoute.route)
                 }
 
@@ -171,7 +167,7 @@ class MainActivity : ComponentActivity() {
             BottomNavigationTab.FutureTabRoute.tabIndex -> {
 
                 if (navController?.currentDestination?.route != NavigationRoute.FutureRoute.route) {
-                    mainViewModel?.setSelectedTab(BottomNavigationTab.FutureTabRoute.tabIndex)
+                    activityViewModel?.setSelectedTab(BottomNavigationTab.FutureTabRoute.tabIndex)
                     navController?.navigate(NavigationRoute.FutureRoute.route)
                 }
             }
@@ -214,7 +210,7 @@ class MainActivity : ComponentActivity() {
                 == NavigationRoute.TodayRoute.route) {
                 finish()
             } else {
-                mainViewModel?.setSelectedTab(BottomNavigationTab.TodayTabRoute.tabIndex)
+                activityViewModel?.setSelectedTab(BottomNavigationTab.TodayTabRoute.tabIndex)
                 tempNavController.popBackStack(NavigationRoute.FutureRoute.route,
                     true)
             }
