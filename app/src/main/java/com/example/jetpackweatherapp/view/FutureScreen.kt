@@ -22,6 +22,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -40,26 +41,40 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jetpackweatherapp.R
+import com.example.jetpackweatherapp.model.dataClasses.ForecastWeather
+import com.example.jetpackweatherapp.model.dataClasses.MainWeatherInfo
 import com.example.jetpackweatherapp.ui.theme.morningColor
 import com.example.jetpackweatherapp.ui.theme.sunColor
-import com.example.jetpackweatherapp.viewModel.TodayViewModel
+import com.example.jetpackweatherapp.viewModel.FutureViewModel
 
 @Composable
 fun FutureScreen(paddingValues: PaddingValues) {
-    val todayViewModel: TodayViewModel = viewModel()
+    val futureViewModel: FutureViewModel = viewModel()
+    val uiState = futureViewModel.futureUiState.collectAsState()
 
     LazyColumn(modifier = Modifier
         .fillMaxSize()
         .background(MaterialTheme.colorScheme.background),
         contentPadding = paddingValues) {
 
-        item {
-            CityTextField()
-            FutureDayWeatherCard(22.dp)
-        }
+        val forecastWeatherList = uiState.value.forecastWeatherList
+        val forecastWeather = uiState.value.forecastWeather
 
-        items(4) {
-            FutureDayWeatherCard()
+        forecastWeather?.let {
+
+            item {
+                CityTextField()
+
+                if (forecastWeather.isNotEmpty()) {
+                    FutureDayWeatherCard(22.dp, forecastWeather[0], forecastWeatherList[0])
+                }
+
+                for (i in 1 until forecastWeather.size) {
+                    FutureDayWeatherCard(
+                        forecastWeather = forecastWeather[i],
+                        forecastWeatherList = forecastWeatherList[i])
+                }
+            }
         }
     }
 }
@@ -104,13 +119,15 @@ private fun CityTextField() {
 
 
 @Composable
-private fun FutureDayWeatherCard(topPadding: Dp = 16.dp) {
+private fun FutureDayWeatherCard(topPadding: Dp = 16.dp,
+                                 forecastWeather: MainWeatherInfo,
+                                 forecastWeatherList: ArrayList<ForecastWeather>) {
 
     val showBottomSheet = rememberSaveable{ mutableStateOf(false) }
 
     if (showBottomSheet.value) {
 
-        FutureBottomSheet(showBottomSheet)
+        FutureBottomSheet(showBottomSheet, forecastWeather, forecastWeatherList)
     }
 
     Box(modifier = Modifier
@@ -128,16 +145,16 @@ private fun FutureDayWeatherCard(topPadding: Dp = 16.dp) {
             Text(modifier = Modifier
                 .wrapContentSize()
                 .padding(top = 16.dp, start = 20.dp),
-                text = "Thursday",
+                text = forecastWeather.cityName,
                 fontSize = 16.sp)
 
-            Text(text = "10°",
+            Text(text = "${forecastWeather.temp}°",
                 fontSize = 64.sp,
                 fontStyle = FontStyle.Normal,
                 modifier = Modifier.padding(top = 8.dp, start = 20.dp)
             )
 
-            Text(text = "Feels like: 12°",
+            Text(text = "Feels like: ${forecastWeather.feelsLike}°",
                 fontSize = 16.sp,
                 modifier = Modifier.padding(top = 8.dp, bottom = 16.dp, start = 20.dp))
         }

@@ -1,4 +1,4 @@
-package com.example.jetpackweatherapp.model.dataClass.currentWeather
+package com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitCurrentWeather
 
 data class Weather(
     val description: String,

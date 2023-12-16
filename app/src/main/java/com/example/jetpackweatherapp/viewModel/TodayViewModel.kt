@@ -1,23 +1,15 @@
 package com.example.jetpackweatherapp.viewModel
 
 import android.app.Application
-import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.jetpackweatherapp.model.Repository
-import com.example.jetpackweatherapp.model.dataClass.currentWeather.CurrentWeather
-import com.example.jetpackweatherapp.model.dataClass.forecastWeather.ForecastWeatherItem
 import com.example.jetpackweatherapp.viewModel.uiState.TodayUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 class TodayViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -32,6 +24,13 @@ class TodayViewModel(application: Application) : AndroidViewModel(application) {
     init {
         if (repository.currentWeather == null) {
             updateWeather()
+        } else {
+            mutableUiState.value =
+                mutableUiState.value.copy(
+                    currentWeather = repository.currentWeather,
+                    currentForecastWeatherList = repository.currentWeatherByHour,
+                    requestResult = 200
+                )
         }
     }
 
@@ -46,7 +45,8 @@ class TodayViewModel(application: Application) : AndroidViewModel(application) {
                 mutableUiState.value =
                     mutableUiState.value.copy(
                         currentWeather = repository.currentWeather,
-                        currentForecastWeatherList = repository.currentForecastWeatherList
+                        currentForecastWeatherList = repository.currentWeatherByHour,
+                        requestResult = resultCode
                     )
 
             } else {

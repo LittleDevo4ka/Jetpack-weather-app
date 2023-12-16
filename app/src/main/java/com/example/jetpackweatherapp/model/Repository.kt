@@ -1,13 +1,13 @@
 package com.example.jetpackweatherapp.model
 
 import android.util.Log
-import com.example.jetpackweatherapp.model.dataClass.currentWeather.CurrentWeather
-import com.example.jetpackweatherapp.model.dataClass.forecastWeather.ForecastWeather
-import com.example.jetpackweatherapp.model.dataClass.forecastWeather.ForecastWeatherItem
-import com.example.jetpackweatherapp.model.dataClass.retrofit.WeatherAPIService
+import com.example.jetpackweatherapp.model.dataClasses.ForecastWeather
+import com.example.jetpackweatherapp.model.dataClasses.MainWeatherInfo
+import com.example.jetpackweatherapp.model.retrofit.WeatherAPIService
+import com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitCurrentWeather.RetrofitCurrentWeather
+import com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitForecastWeather.RetrofitForecastWeather
 import retrofit2.Response
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -17,103 +17,138 @@ class Repository() {
 
     private val retrofit = WeatherAPIService()
 
-    var currentWeather: CurrentWeather? = null
-    var currentForecastWeatherList: ArrayList<ForecastWeatherItem> = arrayListOf()
-    var forecastWeatherList: ArrayList<List<ForecastWeatherItem>> = arrayListOf()
+    var currentWeather: MainWeatherInfo? = null
+    var currentWeatherByHour: ArrayList<ForecastWeather> = arrayListOf()
+
+    var forecastWeatherByDay: ArrayList<MainWeatherInfo>? = null
+    var forecastWeatherByDayByHour: ArrayList<ArrayList<ForecastWeather>> = arrayListOf()
 
     private val enLocale = Locale("en")
-    private val curDateFormat = SimpleDateFormat("EEE, HH:mm", enLocale)
-    private val forecastDateFormat = SimpleDateFormat("HH:mm", enLocale)
 
+    private val mainDateFormat = SimpleDateFormat("EEE, HH:mm", enLocale)
+    private val dayNameDateFormat = SimpleDateFormat("EEEE", enLocale)
     private val dayDateFormat = SimpleDateFormat("dd", enLocale)
+    private val timeDateFormat = SimpleDateFormat("HH:mm", enLocale)
 
     private val date = Date()
 
     suspend fun updateWeather(): Int {
 
-        val tempForecastListWithLists: MutableList<List<ForecastWeatherItem>> = mutableListOf()
-        val tempForecastWeatherList: MutableList<ForecastWeatherItem> = mutableListOf()
-        var prevDate = ""
 
-        val currentWeatherResponse: Response<CurrentWeather>
-        try {
-            currentWeatherResponse = retrofit.getCurrentWeather().execute()
-        } catch (e: Exception) {
-            Log.w(tag, "getCurrentWeather: Something went really wrong: " + e.message)
-            return 300
-        }
+        val weatherByHour: MutableList<ForecastWeather> = mutableListOf()
+        val weatherByDayByHour: MutableList<ArrayList<ForecastWeather>> = mutableListOf()
+        val weatherByDay: MutableList<MainWeatherInfo> = mutableListOf()
 
-        if (currentWeatherResponse.isSuccessful) {
-            Log.w(tag, "getCurrentWeather: Everything all right: " + currentWeatherResponse.code())
+        val retrofitCurrentWeather = getCurrentWeather() ?: return 300
 
-            currentWeatherResponse.body()?.let {
-                val tempDtLong = it.dt * 1000L
-                it.dt_txt = dtToTxt(tempDtLong, curDateFormat)
-                currentWeather = it
+        currentWeather = MainWeatherInfo
+            .fromRetrofitCurrentWeather(retrofitCurrentWeather, mainDateFormat,
+                timeDateFormat, date)
 
+        weatherByHour.add(ForecastWeather
+            .fromRetrofitCurrentWeather(retrofitCurrentWeather, timeDateFormat, date))
 
-                val curWeatherDate = dtToTxt(tempDtLong, forecastDateFormat)
-                prevDate = dtToTxt(tempDtLong, dayDateFormat)
-                tempForecastWeatherList
-                    .add(it.toForecastWeatherItem(curWeatherDate))
+        var prevDate = dtToTxt(retrofitCurrentWeather.dt, dayDateFormat)
+
+        val retrofitForecastWeather = getForecastWeather() ?: return 300
+
+        var i = 0
+        while (i < retrofitForecastWeather.list.size) {
+            val forecastWeatherItem = retrofitForecastWeather.list[i]
+
+            val newDate = dtToTxt(forecastWeatherItem.dt, dayDateFormat)
+            if (newDate != prevDate) {
+
+                break
+            } else {
+                weatherByHour.add(ForecastWeather
+                    .formForecastWeatherItem(forecastWeatherItem, timeDateFormat, date))
+                i++
             }
-        } else {
-            Log.w(tag, "getCurrentWeather: Something went wrong: " + currentWeatherResponse.code())
-            return 300
         }
 
-
-        val forecastWeatherResponse: Response<ForecastWeather>
-        try {
-            forecastWeatherResponse = retrofit.getForecastWeather().execute()
-        } catch (e: Exception) {
-            Log.w(tag, "getForecastWeather: Something went really wrong: " + e.message)
-            return 300
-        }
-
-        if (forecastWeatherResponse.isSuccessful) {
-            Log.w(tag, "getForecastWeather: Everything all right: " + currentWeatherResponse.code())
-
-            forecastWeatherResponse.body()?.let { tempForecastWeather ->
-
-                tempForecastWeather.list.forEach {
-                    val tempDtLong = it.dt * 1000L
-                    it.dt_txt = dtToTxt(tempDtLong, forecastDateFormat)
-
-                    val newDate = dtToTxt(tempDtLong, dayDateFormat)
-                    if (newDate != prevDate) {
-                        tempForecastListWithLists.add(tempForecastWeatherList.toList())
-                        tempForecastWeatherList.clear()
-                        tempForecastWeatherList.add(it)
-                        prevDate = newDate
-                    } else {
-                        tempForecastWeatherList.add(it)
-                    }
-                }
-                tempForecastListWithLists.add(tempForecastWeatherList.toList())
-
-                currentForecastWeatherList = ArrayList(tempForecastListWithLists[0])
-                tempForecastListWithLists.removeAt(0)
-                forecastWeatherList = ArrayList(tempForecastListWithLists.toList())
+        if (weatherByHour.size >= 2) {
+            if (weatherByHour[0].dt > weatherByHour[1].dt) {
+                weatherByHour.removeAt(1)
             }
-        } else {
-            Log.w(tag, "getForecastWeather: Something went wrong: " + currentWeatherResponse.code())
-            return 300
         }
+        currentWeatherByHour = ArrayList(weatherByHour)
+        weatherByHour.clear()
+
+        var prevDateIndex = currentWeatherByHour.size
+        while (i < retrofitForecastWeather.list.size) {
+
+            val forecastWeatherItem = retrofitForecastWeather.list[i]
+            val newDate = dtToTxt(forecastWeatherItem.dt, dayDateFormat)
+
+            if (newDate != prevDate) {
+
+                weatherByDayByHour.add(ArrayList(weatherByHour))
+                weatherByHour.clear()
+
+                val forecastWeatherItemList = retrofitForecastWeather.list.subList(prevDateIndex, i+1)
+                val tempMainWeatherInfo = MainWeatherInfo
+                    .fromRetrofitForecastWeather(
+                        retrofitForecastWeather, forecastWeatherItemList,
+                        dayNameDateFormat, timeDateFormat, date)
+                tempMainWeatherInfo?.let { weatherByDay.add(it) }
+
+                prevDate = newDate
+                prevDateIndex = i+1
+                i++
+            } else {
+                weatherByHour.add(ForecastWeather
+                    .formForecastWeatherItem(forecastWeatherItem, timeDateFormat, date))
+                i++
+            }
+        }
+
+        weatherByDayByHour.removeAt(0)
+        weatherByDayByHour.add(ArrayList(weatherByHour))
+        weatherByHour.clear()
+
+        val forecastWeatherItemList = retrofitForecastWeather.list
+            .subList(prevDateIndex, retrofitForecastWeather.list.size)
+        val tempMainWeatherInfo = MainWeatherInfo
+            .fromRetrofitForecastWeather(
+                retrofitForecastWeather, forecastWeatherItemList,
+                dayNameDateFormat, timeDateFormat, date)
+        tempMainWeatherInfo?.let { weatherByDay.add(tempMainWeatherInfo) }
+
+        forecastWeatherByDay = ArrayList(weatherByDay)
+        forecastWeatherByDayByHour = ArrayList(weatherByDayByHour)
 
         return 200
     }
 
-    private fun getCurrentWeather() {
+    private suspend fun getCurrentWeather(): RetrofitCurrentWeather? {
 
+        val currentWeatherResponse: Response<RetrofitCurrentWeather>
+        try {
+            currentWeatherResponse = retrofit.getCurrentWeather().execute()
+        } catch (e: Exception) {
+            Log.w(tag, "getCurrentWeather: Something went really wrong: " + e.message)
+            return null
+        }
+
+        return currentWeatherResponse.body()
     }
 
-    private fun getForecastWeather() {
+    private suspend fun getForecastWeather(): RetrofitForecastWeather? {
 
+        val forecastWeatherResponse: Response<RetrofitForecastWeather>
+        try {
+            forecastWeatherResponse = retrofit.getForecastWeather().execute()
+        } catch (e: Exception) {
+            Log.w(tag, "getForecastWeather: Something went really wrong: " + e.message)
+            return null
+        }
+
+        return forecastWeatherResponse.body()
     }
 
-    private fun dtToTxt(dt: Long, tempFormat: SimpleDateFormat): String {
-        date.time = dt
+    private fun dtToTxt(dt: Int, tempFormat: SimpleDateFormat): String {
+        date.time = dt * 1000L
         return tempFormat.format(date)
     }
 

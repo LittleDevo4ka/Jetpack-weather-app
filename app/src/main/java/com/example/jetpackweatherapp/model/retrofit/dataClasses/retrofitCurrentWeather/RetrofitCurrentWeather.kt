@@ -1,10 +1,8 @@
-package com.example.jetpackweatherapp.model.dataClass.currentWeather
+package com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitCurrentWeather
 
-import com.example.jetpackweatherapp.model.dataClass.forecastWeather.ForecastWeatherItem
-import java.text.SimpleDateFormat
-import java.util.Calendar
+import com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitForecastWeather.ForecastWeatherItem
 
-data class CurrentWeather(
+data class RetrofitCurrentWeather(
     val base: String,
     val clouds: Clouds,
     val cod: Int,
@@ -25,6 +23,8 @@ data class CurrentWeather(
     fun toForecastWeatherItem(newDtTxt: String): ForecastWeatherItem {
 
         return ForecastWeatherItem(dt, main, weather, clouds, wind, visibility, pop = -1.0,
-            com.example.jetpackweatherapp.model.dataClass.forecastWeather.Rain(0.0), sys, newDtTxt)
+            com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitForecastWeather.Rain(
+                0.0
+            ), sys, newDtTxt)
     }
 }

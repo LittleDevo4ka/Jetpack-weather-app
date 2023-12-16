@@ -1,6 +1,6 @@
-package com.example.jetpackweatherapp.model.dataClass.forecastWeather
+package com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitForecastWeather
 
-import com.example.jetpackweatherapp.model.dataClass.currentWeather.Coord
+import com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitCurrentWeather.Coord
 
 data class City(
     val coord: Coord,

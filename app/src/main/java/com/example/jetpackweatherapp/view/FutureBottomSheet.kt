@@ -31,11 +31,15 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpackweatherapp.R
+import com.example.jetpackweatherapp.model.dataClasses.ForecastWeather
+import com.example.jetpackweatherapp.model.dataClasses.MainWeatherInfo
 import com.example.jetpackweatherapp.ui.theme.sunColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FutureBottomSheet(showBottomSheet: MutableState<Boolean>) {
+fun FutureBottomSheet(showBottomSheet: MutableState<Boolean>,
+                      forecastWeather: MainWeatherInfo,
+                      forecastWeatherList: ArrayList<ForecastWeather>) {
     val sheetState = rememberModalBottomSheetState()
 
     ModalBottomSheet(
@@ -50,17 +54,18 @@ fun FutureBottomSheet(showBottomSheet: MutableState<Boolean>) {
             .fillMaxSize()){
 
             item {
-                BottomSheetWeatherCard()
-                BottomSheetWeatherCards()
-                BottomSheetSunriseSunsetCard()
-                BottomSheetAdditionalInformationCard()
+                BottomSheetWeatherCard(forecastWeather)
+                BottomSheetWeatherCards(forecastWeatherList)
+                BottomSheetSunriseSunsetCard(forecastWeather)
+                BottomSheetAdditionalInformationCard(forecastWeather)
             }
         }
     }
 }
 
 @Composable
-private fun BottomSheetWeatherCard() {
+private fun BottomSheetWeatherCard(forecastWeather: MainWeatherInfo) {
+
     Box(modifier = Modifier
         .fillMaxWidth()
         .wrapContentHeight()
@@ -75,22 +80,22 @@ private fun BottomSheetWeatherCard() {
                 .padding(top = 16.dp, start = 20.dp),
                 verticalAlignment = Alignment.Bottom) {
 
-                Text(text = "Prague",
+                Text(text = forecastWeather.cityName,
                     fontSize = 16.sp)
 
-                Text(text = "Thu, 07:13",
+                Text(text = forecastWeather.dtTxt,
                     fontSize = 12.sp,
                     fontStyle = FontStyle.Normal,
                     modifier = Modifier.padding(start = 16.dp))
             }
 
-            Text(text = "10°",
+            Text(text = "${forecastWeather.temp}°",
                 fontSize = 64.sp,
                 fontStyle = FontStyle.Normal,
                 modifier = Modifier.padding(top = 8.dp, start = 20.dp)
             )
 
-            Text(text = "Feels like: 12°",
+            Text(text = "Feels like: ${forecastWeather.feelsLike}°",
                 fontSize = 16.sp,
                 modifier = Modifier.padding(top = 8.dp, bottom = 16.dp, start = 20.dp))
         }
@@ -108,19 +113,21 @@ private fun BottomSheetWeatherCard() {
 }
 
 @Composable
-private fun BottomSheetWeatherCards() {
+private fun BottomSheetWeatherCards(forecastWeather: ArrayList<ForecastWeather>) {
     LazyRow(modifier = Modifier
         .padding(top = 32.dp),
         contentPadding = PaddingValues(start = 16.dp, end = 8.dp)
     ){
-        items(10) {
-            //WeatherListItem()
+
+        items(forecastWeather.size) {
+            WeatherListItem(forecastWeather[it])
         }
     }
 }
 
 @Composable
-private fun BottomSheetSunriseSunsetCard() {
+private fun BottomSheetSunriseSunsetCard(forecastWeather: MainWeatherInfo) {
+
     Row(verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .padding(top = 20.dp, start = 16.dp, end = 16.dp)
@@ -138,7 +145,7 @@ private fun BottomSheetSunriseSunsetCard() {
             tint = sunColor,
             modifier = Modifier.padding(start = 12.dp))
 
-        Text(text = "04:19",
+        Text(text = forecastWeather.sunrise,
             fontSize = 12.sp,
             fontStyle = FontStyle.Normal,
             modifier = Modifier.padding(start = 4.dp))
@@ -152,7 +159,7 @@ private fun BottomSheetSunriseSunsetCard() {
             tint = sunColor,
             modifier = Modifier.padding(start = 12.dp))
 
-        Text(text = "04:19",
+        Text(text = forecastWeather.sunset,
             fontSize = 12.sp,
             fontStyle = FontStyle.Normal,
             modifier = Modifier.padding(start = 4.dp))
@@ -161,7 +168,7 @@ private fun BottomSheetSunriseSunsetCard() {
 }
 
 @Composable
-private fun BottomSheetAdditionalInformationCard() {
+private fun BottomSheetAdditionalInformationCard(forecastWeather: MainWeatherInfo) {
     Column(modifier = Modifier
         .padding(top = 16.dp, start = 16.dp, end = 16.dp)
         .fillMaxWidth()
@@ -174,7 +181,7 @@ private fun BottomSheetAdditionalInformationCard() {
                 fontSize = 12.sp,
                 fontStyle = FontStyle.Normal)
 
-            Text(text = "1000 hPa",
+            Text(text = "${forecastWeather.pressure} hPa",
                 fontSize = 12.sp,
                 modifier = Modifier.padding(start = 4.dp))
         }
@@ -184,7 +191,7 @@ private fun BottomSheetAdditionalInformationCard() {
                 fontSize = 12.sp,
                 fontStyle = FontStyle.Normal)
 
-            Text(text = "100%",
+            Text(text = "${forecastWeather.clouds}%",
                 fontSize = 12.sp,
                 modifier = Modifier.padding(start = 4.dp))
         }
@@ -194,7 +201,7 @@ private fun BottomSheetAdditionalInformationCard() {
                 fontSize = 12.sp,
                 fontStyle = FontStyle.Normal)
 
-            Text(text = "10000 m",
+            Text(text = "${forecastWeather.visibility} m",
                 fontSize = 12.sp,
                 modifier = Modifier.padding(start = 4.dp, bottom = 16.dp))
         }

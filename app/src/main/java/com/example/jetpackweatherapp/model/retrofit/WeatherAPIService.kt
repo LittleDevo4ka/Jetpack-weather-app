@@ -1,10 +1,9 @@
-package com.example.jetpackweatherapp.model.dataClass.retrofit
+package com.example.jetpackweatherapp.model.retrofit
 
 
 import com.example.jetpackweatherapp.BuildConfig
-import com.example.jetpackweatherapp.model.Repository
-import com.example.jetpackweatherapp.model.dataClass.currentWeather.CurrentWeather
-import com.example.jetpackweatherapp.model.dataClass.forecastWeather.ForecastWeather
+import com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitCurrentWeather.RetrofitCurrentWeather
+import com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitForecastWeather.RetrofitForecastWeather
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
@@ -22,7 +21,7 @@ class WeatherAPIService() {
 
     fun getCurrentWeather(lat: Double = 0.0,
                           lon: Double = 0.0,
-                          units: String = "metric"): Call<CurrentWeather> {
+                          units: String = "metric"): Call<RetrofitCurrentWeather> {
 
         val urlCurWeather = "${baseURLcurWeather}lat=$lat&lon=$lon&appid=$apiKey&units=$units"
 
@@ -32,7 +31,7 @@ class WeatherAPIService() {
 
     fun getForecastWeather(lat: Double = 0.0,
                            lon: Double = 0.0,
-                           units: String = "metric"): Call<ForecastWeather> {
+                           units: String = "metric"): Call<RetrofitForecastWeather> {
 
         val urlForWeather = "${baseURLforWeather}lat=$lat&lon=$lon&appid=$apiKey&units=$units"
 

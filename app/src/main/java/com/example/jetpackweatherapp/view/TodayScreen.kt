@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
@@ -43,15 +42,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.jetpackweatherapp.R
-import com.example.jetpackweatherapp.model.dataClass.currentWeather.CurrentWeather
-import com.example.jetpackweatherapp.model.dataClass.forecastWeather.ForecastWeatherItem
+import com.example.jetpackweatherapp.model.dataClasses.ForecastWeather
+import com.example.jetpackweatherapp.model.dataClasses.MainWeatherInfo
 import com.example.jetpackweatherapp.ui.theme.morningColor
 import com.example.jetpackweatherapp.ui.theme.sunColor
 import com.example.jetpackweatherapp.viewModel.TodayViewModel
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import kotlin.math.round
 
 @Composable
 fun TodayScreen(paddingValues: PaddingValues) {
@@ -124,7 +119,7 @@ private fun CityTextField() {
 }
 
 @Composable
-private fun CurrentWeatherCard(currentWeather: CurrentWeather, todayViewModel: TodayViewModel) {
+private fun CurrentWeatherCard(currentWeather: MainWeatherInfo, todayViewModel: TodayViewModel) {
 
     Box(modifier = Modifier
         .fillMaxWidth()
@@ -140,23 +135,23 @@ private fun CurrentWeatherCard(currentWeather: CurrentWeather, todayViewModel: T
                 .padding(top = 16.dp, start = 20.dp),
                 verticalAlignment = Alignment.Bottom) {
 
-                Text(text = currentWeather.name,
+                Text(text = currentWeather.cityName,
                     fontSize = 16.sp)
 
 
-                Text(text = currentWeather.dt_txt,
+                Text(text = currentWeather.dtTxt,
                     fontSize = 12.sp,
                     fontStyle = FontStyle.Normal,
                     modifier = Modifier.padding(start = 16.dp))
             }
 
-            Text(text = "${round(currentWeather.main.temp).toInt()}°",
+            Text(text = "${currentWeather.temp}°",
                 fontSize = 64.sp,
                 fontStyle = FontStyle.Normal,
                 modifier = Modifier.padding(top = 8.dp, start = 20.dp)
             )
 
-            Text(text = "Feels like: ${round(currentWeather.main.temp).toInt()}°",
+            Text(text = "Feels like: ${currentWeather.feelsLike}°",
                 fontSize = 16.sp,
                 modifier = Modifier.padding(top = 8.dp, bottom = 16.dp, start = 20.dp))
         }
@@ -174,7 +169,7 @@ private fun CurrentWeatherCard(currentWeather: CurrentWeather, todayViewModel: T
 }
 
 @Composable
-private fun FutureWeatherCards(currentForecastWeatherList: ArrayList<ForecastWeatherItem>,
+private fun FutureWeatherCards(currentForecastWeatherList: ArrayList<ForecastWeather>,
                                todayViewModel: TodayViewModel) {
     LazyRow(modifier = Modifier
         .padding(top = 32.dp),
@@ -186,7 +181,8 @@ private fun FutureWeatherCards(currentForecastWeatherList: ArrayList<ForecastWea
 }
 
 @Composable
-private fun SunriseSunsetCard(currentWeather: CurrentWeather, todayViewModel: TodayViewModel) {
+private fun SunriseSunsetCard(currentWeather: MainWeatherInfo,
+                              todayViewModel: TodayViewModel) {
     Row(verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
             .padding(top = 20.dp, start = 16.dp, end = 16.dp)
@@ -204,11 +200,7 @@ private fun SunriseSunsetCard(currentWeather: CurrentWeather, todayViewModel: To
             tint = sunColor,
             modifier = Modifier.padding(start = 12.dp))
 
-        val sunDateFormat = SimpleDateFormat("HH:mm", Locale("en"))
-        val sunriseStr = dtToTxt(currentWeather.sys.sunrise * 1000L, sunDateFormat)
-        val sunsetStr = dtToTxt(currentWeather.sys.sunset * 1000L, sunDateFormat)
-
-        Text(text = sunriseStr,
+        Text(text = currentWeather.sunrise,
             fontSize = 12.sp,
             fontStyle = FontStyle.Normal,
             modifier = Modifier.padding(start = 4.dp))
@@ -222,7 +214,7 @@ private fun SunriseSunsetCard(currentWeather: CurrentWeather, todayViewModel: To
             tint = sunColor,
             modifier = Modifier.padding(start = 12.dp))
 
-        Text(text = sunsetStr,
+        Text(text = currentWeather.sunset,
             fontSize = 12.sp,
             fontStyle = FontStyle.Normal,
             modifier = Modifier.padding(start = 4.dp))
@@ -232,7 +224,7 @@ private fun SunriseSunsetCard(currentWeather: CurrentWeather, todayViewModel: To
 
 @Composable
 private fun AdditionalInformationCard(
-    currentWeather: CurrentWeather,
+    currentWeather: MainWeatherInfo,
     todayViewModel: TodayViewModel
 ) {
     Column(modifier = Modifier
@@ -247,7 +239,7 @@ private fun AdditionalInformationCard(
                 fontSize = 12.sp,
                 fontStyle = FontStyle.Normal)
 
-            Text(text = "${currentWeather.main.pressure} hPa",
+            Text(text = "${currentWeather.pressure} hPa",
                 fontSize = 12.sp,
                 modifier = Modifier.padding(start = 4.dp))
         }
@@ -257,7 +249,7 @@ private fun AdditionalInformationCard(
                 fontSize = 12.sp,
                 fontStyle = FontStyle.Normal)
 
-            Text(text = "${currentWeather.clouds.all}%",
+            Text(text = "${currentWeather.clouds}%",
                 fontSize = 12.sp,
                 modifier = Modifier.padding(start = 4.dp))
         }
@@ -272,9 +264,4 @@ private fun AdditionalInformationCard(
                 modifier = Modifier.padding(start = 4.dp, bottom = 16.dp))
         }
     }
-}
-
-private fun dtToTxt(dt: Long, tempFormat: SimpleDateFormat): String {
-    val date = Date(dt)
-    return tempFormat.format(date)
 }

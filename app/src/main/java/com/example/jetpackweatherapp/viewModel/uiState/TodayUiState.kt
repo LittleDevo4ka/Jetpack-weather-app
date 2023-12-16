@@ -1,10 +1,12 @@
 package com.example.jetpackweatherapp.viewModel.uiState
 
-import com.example.jetpackweatherapp.model.dataClass.currentWeather.CurrentWeather
-import com.example.jetpackweatherapp.model.dataClass.forecastWeather.ForecastWeatherItem
+import com.example.jetpackweatherapp.model.dataClasses.ForecastWeather
+import com.example.jetpackweatherapp.model.dataClasses.MainWeatherInfo
+import com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitCurrentWeather.RetrofitCurrentWeather
+import com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitForecastWeather.ForecastWeatherItem
 
 data class TodayUiState(
     var requestResult: Int = 200,
-    var currentWeather: CurrentWeather? = null,
-    var currentForecastWeatherList: ArrayList<ForecastWeatherItem> = arrayListOf()
+    var currentWeather: MainWeatherInfo? = null,
+    var currentForecastWeatherList: ArrayList<ForecastWeather> = arrayListOf()
 )

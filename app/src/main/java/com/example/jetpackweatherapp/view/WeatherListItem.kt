@@ -11,20 +11,19 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.jetpackweatherapp.R
-import com.example.jetpackweatherapp.model.dataClass.forecastWeather.ForecastWeatherItem
+import com.example.jetpackweatherapp.model.dataClasses.ForecastWeather
 import com.example.jetpackweatherapp.ui.theme.morningColor
 import com.example.jetpackweatherapp.ui.theme.sunColor
 import kotlin.math.round
 
 
 @Composable
-fun WeatherListItem(forecastWeatherItem: ForecastWeatherItem) {
+fun WeatherListItem(forecastWeather: ForecastWeather) {
     Card(modifier = Modifier
         .size(width = 90.dp, height = 158.dp)
         .padding(end = 8.dp),
@@ -33,7 +32,7 @@ fun WeatherListItem(forecastWeatherItem: ForecastWeatherItem) {
             contentColor = MaterialTheme.colorScheme.onPrimary
         )) {
 
-        Text(text = forecastWeatherItem.dt_txt,
+        Text(text = forecastWeather.dtTxt,
             fontSize = 16.sp,
             fontStyle = FontStyle.Normal,
             modifier = Modifier
@@ -48,7 +47,7 @@ fun WeatherListItem(forecastWeatherItem: ForecastWeatherItem) {
                 .align(alignment = Alignment.CenterHorizontally)
                 .size(48.dp))
 
-        Text(text = "${round(forecastWeatherItem.main.temp).toInt()}°",
+        Text(text = "${forecastWeather.temp}°",
             fontSize = 16.sp,
             modifier = Modifier
                 .padding(top = 4.dp)
@@ -65,7 +64,7 @@ fun WeatherListItem(forecastWeatherItem: ForecastWeatherItem) {
                 modifier = Modifier
                     .size(16.dp))
 
-            Text(text = "${forecastWeatherItem.main.humidity}%",
+            Text(text = "${forecastWeather.humidity}%",
                 fontSize = 16.sp,
                 fontStyle = FontStyle.Normal)
         }
