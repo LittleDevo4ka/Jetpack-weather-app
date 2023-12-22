@@ -1,6 +1,6 @@
-package com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitCurrentWeather
+package com.example.jetpackweatherapp.model.retrofit.openWeatherMap.dataClasses.retrofitCurrentWeather
 
-import com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitForecastWeather.ForecastWeatherItem
+import com.example.jetpackweatherapp.model.retrofit.openWeatherMap.dataClasses.retrofitForecastWeather.ForecastWeatherItem
 
 data class RetrofitCurrentWeather(
     val base: String,
@@ -23,7 +23,7 @@ data class RetrofitCurrentWeather(
     fun toForecastWeatherItem(newDtTxt: String): ForecastWeatherItem {
 
         return ForecastWeatherItem(dt, main, weather, clouds, wind, visibility, pop = -1.0,
-            com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitForecastWeather.Rain(
+            com.example.jetpackweatherapp.model.retrofit.openWeatherMap.dataClasses.retrofitForecastWeather.Rain(
                 0.0
             ), sys, newDtTxt)
     }

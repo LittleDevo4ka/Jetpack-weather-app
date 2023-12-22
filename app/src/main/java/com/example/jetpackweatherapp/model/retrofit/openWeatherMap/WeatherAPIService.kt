@@ -1,14 +1,14 @@
-package com.example.jetpackweatherapp.model.retrofit
+package com.example.jetpackweatherapp.model.retrofit.openWeatherMap
 
 
 import com.example.jetpackweatherapp.BuildConfig
-import com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitCurrentWeather.RetrofitCurrentWeather
-import com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitForecastWeather.RetrofitForecastWeather
+import com.example.jetpackweatherapp.model.retrofit.openWeatherMap.dataClasses.retrofitCurrentWeather.RetrofitCurrentWeather
+import com.example.jetpackweatherapp.model.retrofit.openWeatherMap.dataClasses.retrofitForecastWeather.RetrofitForecastWeather
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-class WeatherAPIService() {
+class WeatherAPIService {
 
     private val apiKey = BuildConfig.OpenWeatherMap_API_KEY
     private val baseURLcurWeather : String = "https://api.openweathermap.org/data/2.5/weather?"

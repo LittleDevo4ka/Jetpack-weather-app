@@ -1,13 +1,15 @@
 package com.example.jetpackweatherapp.model.dataClasses
 
-import com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitCurrentWeather.RetrofitCurrentWeather
-import com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitForecastWeather.ForecastWeatherItem
-import com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitForecastWeather.RetrofitForecastWeather
+import com.example.jetpackweatherapp.model.retrofit.openWeatherMap.dataClasses.retrofitCurrentWeather.RetrofitCurrentWeather
+import com.example.jetpackweatherapp.model.retrofit.openWeatherMap.dataClasses.retrofitForecastWeather.ForecastWeatherItem
+import com.example.jetpackweatherapp.model.retrofit.openWeatherMap.dataClasses.retrofitForecastWeather.RetrofitForecastWeather
 import java.text.SimpleDateFormat
 import java.util.Date
 
 data class MainWeatherInfo(
     val cityName: String,
+    val cityLat: Double,
+    val cityLon: Double,
     val dtTxt: String,
     val dt: Int,
     val temp: Int,
@@ -28,6 +30,8 @@ data class MainWeatherInfo(
             date: Date): MainWeatherInfo {
 
             val cityName = retrofitCurrentWeather.name
+            val cityLat = retrofitCurrentWeather.coord.lat
+            val cityLon = retrofitCurrentWeather.coord.lon
             val temp = retrofitCurrentWeather.main.temp.toInt()
             val feelsLike = retrofitCurrentWeather.main.feels_like.toInt()
             val dt = retrofitCurrentWeather.dt
@@ -39,10 +43,10 @@ data class MainWeatherInfo(
             val visibility = retrofitCurrentWeather.visibility
 
             return MainWeatherInfo(
-                cityName, dtTxt, dt,
-                temp, feelsLike, sunrise,
-                sunset, pressure, clouds,
-                visibility)
+                cityName, cityLat, cityLon,
+                dtTxt, dt, temp,
+                feelsLike, sunrise, sunset,
+                pressure, clouds, visibility)
         }
 
         fun fromRetrofitForecastWeather(
@@ -54,6 +58,8 @@ data class MainWeatherInfo(
 
             if (forecastWeatherList.isNotEmpty()) {
                 val cityName = retrofitForecastWeather.city.name
+                val cityLat = retrofitForecastWeather.city.coord.lat
+                val cityLon = retrofitForecastWeather.city.coord.lon
                 val dt = forecastWeatherList[0].dt
                 val dtTxt = dtToTxt(dt, dateFormat, date)
                 val sunrise = dtToTxt(forecastWeatherList[0].sys.sunrise, sunDateFormat, date)
@@ -80,10 +86,10 @@ data class MainWeatherInfo(
                 visibility /= listSize
 
                 return MainWeatherInfo(
-                    cityName, dtTxt, dt,
-                    temp.toInt(), feelsLike.toInt(), sunrise,
-                    sunset, pressure.toInt(), clouds.toInt(),
-                    visibility.toInt())
+                    cityName, cityLat, cityLon,
+                    dtTxt, dt, temp.toInt(),
+                    feelsLike.toInt(), sunrise, sunset,
+                    pressure.toInt(), clouds.toInt(), visibility.toInt())
             } else return null
 
         }

@@ -1,4 +1,4 @@
-package com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitForecastWeather
+package com.example.jetpackweatherapp.model.retrofit.openWeatherMap.dataClasses.retrofitForecastWeather
 
 data class RetrofitForecastWeather(
     val cod : String,

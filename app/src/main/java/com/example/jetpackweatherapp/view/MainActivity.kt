@@ -87,7 +87,9 @@ class MainActivity : ComponentActivity() {
                     popEnterTransition = { fadeIn(animationSpec = tween(durationMillis = 300)) },
                     popExitTransition = { fadeOut(animationSpec = tween(durationMillis = 300)) }) {
 
-                    TodayScreen(paddingValues)
+                    activityViewModel?.let {
+                        TodayScreen(paddingValues, it)
+                    }
                 }
 
                 composable(NavigationRoute.FutureRoute.route,
@@ -96,7 +98,9 @@ class MainActivity : ComponentActivity() {
                     popEnterTransition = { fadeIn(animationSpec = tween(durationMillis = 300)) },
                     popExitTransition = { fadeOut(animationSpec = tween(durationMillis = 300)) }) {
 
-                    FutureScreen(paddingValues)
+                    activityViewModel?.let {
+                        FutureScreen(paddingValues, it)
+                    }
                 }
             }
         }
@@ -159,6 +163,7 @@ class MainActivity : ComponentActivity() {
             BottomNavigationTab.TodayTabRoute.tabIndex -> {
                 if (navController?.currentDestination?.route != NavigationRoute.TodayRoute.route) {
                     activityViewModel?.setSelectedTab(BottomNavigationTab.TodayTabRoute.tabIndex)
+                    activityViewModel?.clearCitiesList()
                     navController?.navigate(NavigationRoute.TodayRoute.route)
                 }
 
@@ -168,6 +173,7 @@ class MainActivity : ComponentActivity() {
 
                 if (navController?.currentDestination?.route != NavigationRoute.FutureRoute.route) {
                     activityViewModel?.setSelectedTab(BottomNavigationTab.FutureTabRoute.tabIndex)
+                    activityViewModel?.clearCitiesList()
                     navController?.navigate(NavigationRoute.FutureRoute.route)
                 }
             }

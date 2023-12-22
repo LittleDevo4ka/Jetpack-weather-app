@@ -1,11 +1,14 @@
 package com.example.jetpackweatherapp.model
 
 import android.util.Log
+import com.example.jetpackweatherapp.model.dataClasses.AutocompleteCity
 import com.example.jetpackweatherapp.model.dataClasses.ForecastWeather
 import com.example.jetpackweatherapp.model.dataClasses.MainWeatherInfo
-import com.example.jetpackweatherapp.model.retrofit.WeatherAPIService
-import com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitCurrentWeather.RetrofitCurrentWeather
-import com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitForecastWeather.RetrofitForecastWeather
+import com.example.jetpackweatherapp.model.retrofit.geoApify.AutocompleteAPIService
+import com.example.jetpackweatherapp.model.retrofit.geoApify.dataClasses.RetrofitAutocompleteResponse
+import com.example.jetpackweatherapp.model.retrofit.openWeatherMap.WeatherAPIService
+import com.example.jetpackweatherapp.model.retrofit.openWeatherMap.dataClasses.retrofitCurrentWeather.RetrofitCurrentWeather
+import com.example.jetpackweatherapp.model.retrofit.openWeatherMap.dataClasses.retrofitForecastWeather.RetrofitForecastWeather
 import retrofit2.Response
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -15,13 +18,16 @@ class Repository() {
 
     private val tag = "Repository"
 
-    private val retrofit = WeatherAPIService()
+    private val weatherRetrofit = WeatherAPIService()
+    private val autocompleteRetrofit = AutocompleteAPIService()
 
     var currentWeather: MainWeatherInfo? = null
     var currentWeatherByHour: ArrayList<ForecastWeather> = arrayListOf()
 
     var forecastWeatherByDay: ArrayList<MainWeatherInfo>? = null
     var forecastWeatherByDayByHour: ArrayList<ArrayList<ForecastWeather>> = arrayListOf()
+
+    var autocompleteCities: ArrayList<AutocompleteCity> = arrayListOf()
 
     private val enLocale = Locale("en")
 
@@ -125,10 +131,18 @@ class Repository() {
 
         val currentWeatherResponse: Response<RetrofitCurrentWeather>
         try {
-            currentWeatherResponse = retrofit.getCurrentWeather().execute()
+            currentWeatherResponse = weatherRetrofit.getCurrentWeather().execute()
         } catch (e: Exception) {
             Log.w(tag, "getCurrentWeather: Something went really wrong: " + e.message)
             return null
+        }
+
+        if (currentWeatherResponse.isSuccessful) {
+            Log.i(tag, "getCurrentWeather: Everything went well: " +
+                    currentWeatherResponse.code())
+        } else {
+            Log.w(tag, "getCurrentWeather: Something went really wrong: " +
+                    currentWeatherResponse.code())
         }
 
         return currentWeatherResponse.body()
@@ -138,10 +152,18 @@ class Repository() {
 
         val forecastWeatherResponse: Response<RetrofitForecastWeather>
         try {
-            forecastWeatherResponse = retrofit.getForecastWeather().execute()
+            forecastWeatherResponse = weatherRetrofit.getForecastWeather().execute()
         } catch (e: Exception) {
             Log.w(tag, "getForecastWeather: Something went really wrong: " + e.message)
             return null
+        }
+
+        if (forecastWeatherResponse.isSuccessful) {
+            Log.i(tag, "getForecastWeather: Everything went well: " +
+                    forecastWeatherResponse.code())
+        } else {
+            Log.w(tag, "getForecastWeather: Something went really wrong: " +
+                    forecastWeatherResponse.code())
         }
 
         return forecastWeatherResponse.body()
@@ -150,6 +172,44 @@ class Repository() {
     private fun dtToTxt(dt: Int, tempFormat: SimpleDateFormat): String {
         date.time = dt * 1000L
         return tempFormat.format(date)
+    }
+
+    suspend fun getCities(query: String, lang: String): Int {
+
+        val citiesResponse: Response<RetrofitAutocompleteResponse>
+
+        try {
+            citiesResponse = autocompleteRetrofit.getCities(query, lang).execute()
+        } catch (e: Exception) {
+            Log.w(tag, "getCities: Something went really wrong: " + e.message)
+
+            return 300
+        }
+
+        if (citiesResponse.isSuccessful) {
+            Log.i(tag, "getCities: Everything went well: " +
+                    citiesResponse.code())
+
+            citiesResponse.body()?.let {
+                val autocompleteCitesList: MutableList<AutocompleteCity> = mutableListOf()
+
+                it.results.forEach {  result ->
+                    result?.let { notNullResult ->
+                        autocompleteCitesList
+                            .add((AutocompleteCity.fromAutocompleteFeature(notNullResult)))
+                    }
+                }
+
+                autocompleteCities = ArrayList(autocompleteCitesList)
+            }
+
+            return 200
+        } else {
+            Log.w(tag, "getCities: Something went really wrong: " +
+                    citiesResponse.code())
+
+            return 300
+        }
     }
 
 

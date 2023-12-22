@@ -1,4 +1,4 @@
-package com.example.jetpackweatherapp.model.retrofit.dataClasses.retrofitCurrentWeather
+package com.example.jetpackweatherapp.model.retrofit.openWeatherMap.dataClasses.retrofitCurrentWeather
 
 data class Sys(
     val country: String,

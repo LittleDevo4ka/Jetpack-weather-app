@@ -26,6 +26,9 @@ android {
 
         buildConfigField("String", "OpenWeatherMap_API_KEY",
             "\"${properties.getProperty("OpenWeatherMap_API_KEY")}\"")
+
+        buildConfigField("String", "Autocomplete_API_KEY",
+            "\"${properties.getProperty("Autocomplete_API_KEY")}\"")
     }
 
     buildTypes {
